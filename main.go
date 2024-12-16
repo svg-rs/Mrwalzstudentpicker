@@ -13,18 +13,23 @@ import (
 func main() {
 	color.Set(color.FgHiWhite, color.BgBlack)
 	var periodName int
-	var openingText string = "Hello Mr.Walz\n Enter The Class Period -> "
+	openingText := "Hello Mr.Walz\n Enter The Class Period -> "
 	boldWhite := color.New(color.FgWhite, color.Bold)
 	boldWhite.Print(openingText)
 	fmt.Scan(&periodName)
-
-	fmt.Print("\nThe Period Is ", periodName)
-	time.Sleep(2 * time.Second)
-
-	keyboard.Open()
-	defer keyboard.Close()
-
-	getStudents(periodName)
+	for {
+		switch periodName {
+		case 1, 2, 3, 4, 5, 6:
+			fmt.Print("\nThe Period Is ", periodName)
+			time.Sleep(2 * time.Second)
+			keyboard.Open()
+			defer keyboard.Close()
+			getStudents(periodName)
+		default:
+			fmt.Println("Invalid Period Name")
+			return
+		}
+	}
 }
 
 func getStudents(periodName int) {
@@ -62,7 +67,11 @@ func getStudents(periodName int) {
 		fmt.Println("\nPress 'A' to select a student...")
 
 		for {
-			key, _, _ := keyboard.GetKey()
+			key, _, err := keyboard.GetKey()
+			if err != nil {
+				fmt.Println("Error reading keyboard input:", err)
+				return
+			}
 			if key == 'a' {
 				randomIndex := rand.Intn(len(studentList))
 				selectedStudent := studentList[randomIndex]
