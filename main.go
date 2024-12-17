@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/eiannone/keyboard"
@@ -12,22 +11,34 @@ import (
 
 func main() {
 	color.Set(color.FgHiWhite, color.BgBlack)
+	var banner string = `
+	_____ __            __           __     ____  _      __            
+   / ___// /___  ______/ /__  ____  / /_   / __ \(_)____/ /_____  _____
+   \__ \/ __/ / / / __  / _ \/ __ \/ __/  / /_/ / / ___/ //_/ _ \/ ___/
+  ___/ / /_/ /_/ / /_/ /  __/ / / / /_   / ____/ / /__/ ,< /  __/ /    
+ /____/\__/\__,_/\__,_/\___/_/ /_/\__/  /_/   /_/\___/_/|_|\___/_/     
+																	   
+ `
+	fmt.Println(banner)
 	var periodName int
 	openingText := "Hello Mr.Walz\n Enter The Class Period -> "
 	boldWhite := color.New(color.FgWhite, color.Bold)
-	boldWhite.Print(openingText)
-	fmt.Scan(&periodName)
 	for {
+		boldWhite.Print(openingText)
+		fmt.Scan(&periodName)
 		switch periodName {
 		case 1, 2, 3, 4, 5, 6:
 			fmt.Print("\nThe Period Is ", periodName)
 			time.Sleep(2 * time.Second)
-			keyboard.Open()
-			defer keyboard.Close()
+			if err := keyboard.Open(); err != nil {
+				fmt.Println("Error opening keyboard:", err)
+				return
+			}
 			getStudents(periodName)
+			keyboard.Close()
+			return
 		default:
 			fmt.Println("Invalid Period Name")
-			return
 		}
 	}
 }
@@ -62,7 +73,16 @@ func getStudents(periodName int) {
 	}
 
 	rand.Seed(time.Now().UnixNano())
-
+	fmt.Print("\033[H\033[2J")
+	var banner string = `
+	_____ __            __           __     ____  _      __            
+   / ___// /___  ______/ /__  ____  / /_   / __ \(_)____/ /_____  _____
+   \__ \/ __/ / / / __  / _ \/ __ \/ __/  / /_/ / / ___/ //_/ _ \/ ___/
+  ___/ / /_/ /_/ / /_/ /  __/ / / / /_   / ____/ / /__/ ,< /  __/ /    
+ /____/\__/\__,_/\__,_/\___/_/ /_/\__/  /_/   /_/\___/_/|_|\___/_/     
+																	   
+ `
+	fmt.Println(banner)
 	for len(studentList) > 0 {
 		fmt.Println("\nPress 'A' to select a student...")
 
@@ -83,7 +103,9 @@ func getStudents(periodName int) {
 					fmt.Println("\nAll students have been selected.")
 					fmt.Print("\nExiting now in 3 seconds")
 					time.Sleep(3 * time.Second)
-					os.Exit(0)
+					// os.Exit(0)
+					fmt.Print("\033[H\033[2J")
+					main()
 				}
 				break
 			}
